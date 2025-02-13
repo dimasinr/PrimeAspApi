@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "5rJyTb95kteVIdROV5xvktZGY3QUjfiajwWjKp9AxP0=",
+  "Source": "PrimeAspApi",
+  "BasePath": "_content/PrimeAspApi",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
