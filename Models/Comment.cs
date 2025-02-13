@@ -1,5 +1,5 @@
-using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PrimeAspApi.Models
 {
@@ -12,9 +12,13 @@ namespace PrimeAspApi.Models
         public required string Content { get; set; }
         
         [Required]
-        public required string Author { get; set; }
+        public int AuthorId { get; set; }
         
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [ForeignKey("AuthorId")]
+        public User? Author { get; set; }
     }
 
+    
 }

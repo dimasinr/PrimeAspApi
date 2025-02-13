@@ -8,7 +8,9 @@ namespace PrimeAspApi.Services
     {
         Task<IEnumerable<Comment>> GetAllComments();
         Task<Comment> GetCommentById(int id);
-        Task AddComment(Comment comment);
+        // Task<Comment> CreateCommentAsync(Comment comment);
+
+        Task<Comment> CreateCommentAsync(string comment, int authorId);
         Task<bool> DeleteComment(int id);
     }
 }

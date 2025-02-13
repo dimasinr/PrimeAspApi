@@ -21,8 +21,25 @@ namespace PrimeAspApi.Controllers
         public async Task<ActionResult<IEnumerable<Comment>>> GetAllComments()
         {
             var comments = await _commentService.GetAllComments();
-            return Ok(comments);
+
+            var response = comments.Select(comment => new CommentsDto
+            {
+                Id = comment.Id,
+                Content = comment.Content,
+                AuthorId = comment.AuthorId,
+                CreatedAt = comment.CreatedAt,
+                Author = comment.Author == null ? null : new UserDto
+                {
+                    Id = comment.Author.Id,
+                    Name = comment.Author.Name,
+                    Email = comment.Author.Email
+                }
+            }).ToList();
+
+            return Ok(response);
         }
+
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Comment>> GetCommentById(int id)
@@ -31,11 +48,34 @@ namespace PrimeAspApi.Controllers
             if (comment == null) return NotFound();
             return Ok(comment);
         }
+        // public async Task<CommentDto> GetCommentByIdAsync(int id)
+        // {
+        //     var comment = await _commentRepository.GetCommentByIdAsync(id);
+        //     if (comment == null) return null;
+
+        //     return new CommentDto
+        //     {
+        //         Id = comment.Id,
+        //         Content = comment.Content,
+        //         AuthorId = comment.AuthorId,
+        //         CreatedAt = comment.CreatedAt,
+        //         Author = new UserDto
+        //         {
+        //             Id = comment.Author.Id,
+        //             Name = comment.Author.Name,
+        //             Email = comment.Author.Email
+        //         }
+        //     };
+        // }
 
         [HttpPost]
-        public async Task<ActionResult> AddComment([FromBody] Comment comment)
+        public async Task<IActionResult> PostComment([FromBody] CommentDto commentDto)
         {
-            await _commentService.AddComment(comment);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var comment = await _commentService.CreateCommentAsync(commentDto.Content, commentDto.AuthorId);
+
             return CreatedAtAction(nameof(GetCommentById), new { id = comment.Id }, comment);
         }
 
@@ -63,5 +103,26 @@ namespace PrimeAspApi.Controllers
                     new {message="Error deleting data"});
             }
         }
+    }
+    public class CommentDto
+    {
+        public required string Content { get; set; }
+        public int AuthorId { get; set; }
+    }
+
+    public class CommentsDto
+    {
+        public int Id { get; set; }
+        public string? Content { get; set; }
+        public int AuthorId { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public UserDto? Author { get; set; } 
+    }
+
+    public class UserDto
+    {
+        public required int Id { get; set; }
+        public required string Name { get; set; }
+        public required string Email { get; set; }
     }
 }

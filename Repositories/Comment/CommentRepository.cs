@@ -15,21 +15,35 @@ namespace PrimeAspApi.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Comment>> GetAllCommentsAsync()
+        public async Task<List<Comment>> GetAllCommentsAsync()
         {
-            return await _context.Comments.ToListAsync();
+            var comments = await _context.Comments
+                .Include(c => c.Author) // Ensure Author is included
+                .ToListAsync();
+
+            // Debugging: Print loaded comments
+            foreach (var comment in comments)
+            {
+                Console.WriteLine($"Comment: {comment.Content}, Author: {comment.Author?.Name ?? "NULL"}");
+            }
+
+            return comments;
         }
 
         public async Task<Comment> GetCommentByIdAsync(int id)
         {
 #pragma warning disable CS8603 // Possible null reference return.
-            return await _context.Comments.FindAsync(id);
+            return await _context.Comments
+                .Include(c => c.Author) // Ensure Author is loaded
+                .FirstOrDefaultAsync(c => c.Id == id);
 #pragma warning restore CS8603 // Possible null reference return.
         }
 
-        public async Task AddCommentAsync(Comment comment)
+        public async Task<Comment> CreateCommentAsync(Comment comment)
         {
-            await _context.Comments.AddAsync(comment);
+            _context.Comments.Add(comment);
+            await _context.SaveChangesAsync();
+            return comment;
         }
 
         public async Task<bool> DeleteCommentAsync(int id)
